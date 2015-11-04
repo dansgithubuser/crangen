@@ -10,6 +10,7 @@ parser=argparse.ArgumentParser(description=(
 	'Inline Python code can set result to a string of target code, result is initialized as "". '
 ))
 parser.add_argument('input', help='where to base metasource paths off of')
+parser.add_argument('--script', action='append', help='a Python scripts to run before processing metasource')
 parser.add_argument('--metasource', action='append', help='a metasource to process and create an output from')
 parser.add_argument('--output', default='.', help='where to put output')
 parser.add_argument('--define', action='append', help='define a variable with a value, separate with an equal sign, like variable=value')
@@ -38,6 +39,11 @@ if args.define:
 	for d in args.define:
 		name, value=d.split('=')
 		store(name, value)
+
+for s in args.scripts:
+	full_path=os.path.join(args.input, s)
+	with open(full_path) as f: metablock=f.read()
+	exec_local(metablock, full_path)
 
 for m in args.metasource:
 	full_path=os.path.join(args.input, m)

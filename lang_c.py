@@ -186,3 +186,9 @@ def gen_print_enum(enum_variable, enum_node, ast, print_prefix='printf("', print
 		result+='\tcase '+enum+': '+print_prefix+enum+print_postfix+' break;\n'
 	result+='}\n';
 	return result
+
+def gen_enum(name, iterable, transform):
+	result='enum '+name+'{\n'
+	for i in iterable: result+='\t'+transform(i)+',\n'
+	result+='};\n'
+	return result
