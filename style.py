@@ -1,6 +1,6 @@
 def from_camel(s):
 	l=[s[0]]
-	for c in s:
+	for c in s[1:]:
 		if c.istitle(): l.append('')
 		l[-1]+=c
 	return l
