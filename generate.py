@@ -7,11 +7,13 @@ parser=argparse.ArgumentParser(description=(
 	'Inline Python code is marked with surrounding /*\\ and \\*/ markings, each on their own line. '+
 	'Inline Python code can call the functions store(name, value) and load(name) to store variables across blocks. '+
 	'Inline Python code can access the path variable to get the folder containing the metasource. '
-	'Inline Python code can set result to a string of target code, result is initialized as "". '
+	'Inline Python code can set result to a string of target code, result is initialized as "". '+
+	'Each result of a metasource will be placed in the output folder with a parallel file structure, and .meta removed from its name.'
 ))
-parser.add_argument('input', help='where to base metasource paths off of')
-parser.add_argument('--metasource', action='append', help='a metasource to process and create an output from')
-parser.add_argument('--output', default='.', help='where to put output')
+parser.add_argument('input', help='where to base paths off of')
+parser.add_argument('--metasource', action='append', help='path to metasource to process and create an output from')
+parser.add_argument('--script', default=[], action='append', help='path to script to process')
+parser.add_argument('--output', default='.', help='path to put output')
 parser.add_argument('--define', action='append', help='define a variable with a value, separate with an equal sign, like variable=value')
 args=parser.parse_args()
 
@@ -38,6 +40,11 @@ if args.define:
 	for d in args.define:
 		name, value=d.split('=')
 		store(name, value)
+
+for s in args.script:
+	full_path=os.path.join(args.input, s)
+	with open(full_path) as f: script=f.read()
+	exec_local(script, full_path)
 
 for m in args.metasource:
 	full_path=os.path.join(args.input, m)
