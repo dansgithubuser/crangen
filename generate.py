@@ -1,4 +1,4 @@
-import style, lang_c
+import style, lang_c, lang_cpp
 import argparse, os, re
 
 parser=argparse.ArgumentParser(description=(
@@ -29,6 +29,7 @@ def exec_local(x, metasource):
 			'path': os.path.split(os.path.realpath(metasource))[0],
 			'style': style,
 			'lang_c': lang_c,
+			'lang_cpp': lang_cpp,
 			're': re,
 			'os': os
 		},

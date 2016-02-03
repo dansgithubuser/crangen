@@ -1,5 +1,11 @@
-from pycparser import c_ast as c
-from pycparser import parse_file
+try:
+	from pycparser import c_ast as c
+	from pycparser import parse_file
+except ImportError:
+	print('+---------------------------------------+')
+	print('| pycparser missing, continuing without |')
+	print('+---------------------------------------+')
+
 import os
 
 def unhandled(node):
