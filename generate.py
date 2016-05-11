@@ -45,7 +45,11 @@ if args.define:
 for s in args.script:
 	full_path=os.path.join(args.input, s)
 	with open(full_path) as f: script=f.read()
-	exec_local(script, full_path)
+	try:
+		exec_local(script, full_path)
+	except Exception as e:
+		print('exception while running script '+full_path)
+		raise
 
 for m in args.metasource:
 	full_path=os.path.join(args.input, m)
