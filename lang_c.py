@@ -22,7 +22,7 @@ def describe(node):
 		for attr in dir(node)
 		if not attr.startswith('_')
 	]
-	return str(type(node))+'\n'.join(attrs)+'\n'+b.getvalue()
+	return str(type(node))+'\n'+'\n'.join(attrs)+'\n'+b.getvalue()
 
 def get_ast(path):
 	folder=os.path.split(os.path.realpath(__file__))[0]
@@ -88,14 +88,10 @@ def get_type_str(node):
 	#	arr='array'
 	#	if node.dim: arr += '[%s]' % node.dim.value
 	#	return arr + " of " + get_type_str(node.type)
-	#elif type(node)==c.FuncDecl:
-	#	if node.args:
-	#		params = [get_type_str(param) for param in node.args.params]
-	#		args = ', '.join(params)
-	#	else:
-	#		args = ''
-	#	return ('function(%s) returning ' % (args) +
-	#			get_type_str(node.type))
+	elif type(node)==c.FuncDecl:
+		params=''
+		if node.args: params=', '.join([get_type_str(param) for param in node.args.params])
+		return get_type_str(node.type)+' (*)('+params+')'
 	else: unhandled(node)
 
 def get_args(node):
