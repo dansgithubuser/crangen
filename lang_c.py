@@ -1,11 +1,3 @@
-try:
-	from pycparser import c_ast as c
-	from pycparser import parse_file
-except ImportError:
-	print('+---------------------------------------+')
-	print('| pycparser missing, continuing without |')
-	print('+---------------------------------------+')
-
 import os
 
 def unhandled(node):
@@ -31,9 +23,11 @@ def get_ast(path):
 		os.path.join(folder, 'fake_cpp.py'),
 		'-I'+os.path.join(folder, 'fake_libc_include')
 	]
+	from pycparser import parse_file
 	return parse_file(path, use_cpp=True, cpp_path=cpp_path, cpp_args=cpp_args)
 
 def get_node(name, nodes):
+	from pycparser import c_ast as c
 	class NodeGetter(c.NodeVisitor):
 		def generic_visit(self, node):
 			if get_name(node)==self.name: self.result=node
@@ -47,6 +41,7 @@ def get_node(name, nodes):
 	return NodeGetter().get(name, nodes)
 
 def get_name(node):
+	from pycparser import c_ast as c
 	if isinstance(node, c.Decl): return node.name
 	elif isinstance(node, c.Typedef): return node.name
 	elif isinstance(node, c.TypeDecl): return node.declname
@@ -65,11 +60,13 @@ def get_name(node):
 	unhandled(node)
 
 def get_value(node, ast):
+	from pycparser import c_ast as c
 	if isinstance(node, c.Constant): return int(node.value)
 	unhandled(node)
 
 #get the C code that represents the type of this node
 def get_type_str(node):
+	from pycparser import c_ast as c
 	if type(node)==c.Decl:
 		storage=' '.join(node.storage)+' 'if node.storage else ''
 		return storage+get_type_str(node.type)
@@ -100,6 +97,7 @@ def get_args(node):
 	return node.type.args.params
 
 def get_enum_list(node, ast):
+	from pycparser import c_ast as c
 	if isinstance(node, c.Typedef): return get_enum_list(node.type, ast)
 	if isinstance(node, c.TypeDecl): return get_enum_list(node.type, ast)
 	if not isinstance(node, c.Enum):
@@ -113,6 +111,7 @@ def get_enum_list(node, ast):
 	return result
 
 def get_fields(node, ast):
+	from pycparser import c_ast as c
 	if isinstance(node, c.Struct): return node.decls
 	if isinstance(node, c.Decl): return get_fields(node.type, ast)
 	if isinstance(node, c.TypeDecl): return get_fields(node.type, ast)
@@ -121,12 +120,14 @@ def get_fields(node, ast):
 	unhandled(node)
 
 def is_function_declaration(node):
+	from pycparser import c_ast as c
 	if not isinstance(node, c.Decl): return False
 	if not isinstance(node.type, c.FuncDecl): return False
 	return True
 
 #check if a node represents a pointer or array -- may have false negatives
 def is_pointy(node, ast):
+	from pycparser import c_ast as c
 	if isinstance(node, c.PtrDecl): return True
 	if isinstance(node, c.ArrayDecl): return True
 	if isinstance(node, c.Decl): return is_pointy(node.type, ast)
@@ -139,6 +140,7 @@ def is_pointy(node, ast):
 
 #check if a node represents a pointer -- may have false negatives
 def is_pointer(node, ast):
+	from pycparser import c_ast as c
 	if isinstance(node, c.PtrDecl): return True
 	if isinstance(node, c.Decl): return is_pointer(node.type, ast)
 	if isinstance(node, c.TypeDecl): return is_pointer(node.type, ast)
@@ -150,6 +152,7 @@ def is_pointer(node, ast):
 
 #check if a node represents an integer or enum -- may have false negatives
 def is_integral(node, ast):
+	from pycparser import c_ast as c
 	if isinstance(node, c.Enum): return True
 	if isinstance(node, c.Decl): return is_integral(node.type, ast)
 	if isinstance(node, c.TypeDecl): return is_integral(node.type, ast)
@@ -162,6 +165,7 @@ def is_integral(node, ast):
 
 #check if a node represents a struct -- may have false negatives
 def is_struct(node, ast):
+	from pycparser import c_ast as c
 	if isinstance(node, c.Struct): return True
 	if isinstance(node, c.Decl): return is_struct(node.type, ast)
 	if isinstance(node, c.TypeDecl): return is_struct(node.type, ast)
@@ -173,6 +177,7 @@ def is_struct(node, ast):
 
 #check if a node represents a floating point number -- may have false negatives
 def is_floaty(node, ast):
+	from pycparser import c_ast as c
 	if isinstance(node, c.Decl): return is_floaty(node.type, ast)
 	if isinstance(node, c.TypeDecl): return is_floaty(node.type, ast)
 	if isinstance(node, c.Typedef): return is_floaty(node.type, ast)
