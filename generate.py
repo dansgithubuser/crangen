@@ -11,7 +11,7 @@ parser=argparse.ArgumentParser(description=(
 	'Each result of a metasource will be placed in the output folder with a parallel file structure, and .meta removed from its name.'
 ))
 parser.add_argument('input', help='where to base paths off of')
-parser.add_argument('--metasource', action='append', help='path to metasource to process and create an output from -- if unspecified, all *.meta.* files in input are processed')
+parser.add_argument('--metasource', action='append', help='path to metasource to process and create an output from -- if unspecified, all *.meta* files in input are processed')
 parser.add_argument('--script', default=[], action='append', help='path to script to process')
 parser.add_argument('--output', default='.', help='path to put output')
 parser.add_argument('--define', action='append', help='define a variable with a value, separate with an equal sign, like variable=value')
@@ -51,16 +51,21 @@ for s in args.script:
 		print('exception while running script '+full_path)
 		raise
 
-if args.metasource:
-	args.metasource=[os.path.join(args.input, i) for i in args.metasource]
-else:
+def split_path(path):
+	result=[]
+	while path:
+		path, x=os.path.split(path)
+		result=[x]+result
+	return result
+
+if not args.metasource:
 	args.metasource=[]
-	if not args.metasource:
-		for root, dirs, files in os.walk(args.input):
-			args.metasource+=[os.path.join(root, i) for i in fnmatch.filter(files, '*.meta.*')]
+	for root, dirs, files in os.walk(args.input):
+		args.metasource+=[os.path.join(*(split_path(root)[1:]+[i])) for i in fnmatch.filter(files, '*.meta*')]
 
 for m in args.metasource:
-	with open(m) as f: lines=f.readlines()
+	full_path=os.path.join(args.input, m)
+	with open(full_path) as f: lines=f.readlines()
 	output=''
 	meta=False
 	metablock=''
@@ -72,7 +77,7 @@ for m in args.metasource:
 		elif '\\*/' in lines[i]:
 			meta=False
 			try:
-				result=exec_local(metablock, m)
+				result=exec_local(metablock, full_path)
 			except Exception as e:
 				import traceback, sys
 				numbered_metablock=metablock.split('\n')
