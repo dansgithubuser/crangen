@@ -91,7 +91,7 @@ for m in args.metasource:
 				print(numbered_metablock)
 				sys.exit(1)
 			result=result.strip().split('\n')
-			for j in range(len(result)): result[j]='\t'*tabs+result[j]
+			for j in range(len(result)): result[j]='\t'*tabs+result[j]+'//{}:{}'.format(m, i+1)
 			result='\n'.join(result)+'\n'
 			output+=result
 			metablock=''
