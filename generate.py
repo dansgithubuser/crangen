@@ -6,7 +6,9 @@ parser=argparse.ArgumentParser(description=(
 	'The main goal is to be able to generate target code inline with Python code. '+
 	'Inline Python code is marked with surrounding /*\\ and \\*/ markings, each on their own line. '+
 	'Inline Python code can call the functions store(name, value) and load(name) to store variables across blocks. '+
-	'Inline Python code can access the path variable to get the folder containing the metasource. '
+	'Store a dictionary in __header__ or __footer__ that maps a file name regex to a metablock to append to each generated file. '+
+	'Inline Python code can access the path variable to get the folder containing the metasource. '+
+	'Inline Python code can access the relative_path variable to identify the metasource -- important for headers and footers. '+
 	'Inline Python code can set result to a string of target code, result is initialized as "". '+
 	'Each result of a metasource will be placed in the output folder with a parallel file structure, and .meta removed from its name.'
 ))
@@ -27,6 +29,7 @@ def exec_local(x, metasource):
 			'store': store,
 			'load': load,
 			'path': os.path.split(os.path.realpath(metasource))[0],
+			'relative_path': metasource,
 			'style': style,
 			'lang_c': lang_c,
 			'lang_cpp': lang_cpp,
@@ -98,10 +101,20 @@ for m in args.metasource:
 		elif meta:
 			if re.search(r'\S', lines[i]):
 				if lines[i][:tabs]!='\t'*tabs:
-					raise Exception('indentation error on line {0}'.format(i+1))
+					raise Exception('indentation error on line {}'.format(i+1))
 			metablock+=lines[i][tabs:]
 		else: output+=lines[i]
 	path=os.path.join(args.output, m.replace('.meta', ''))
 	try: os.makedirs(os.path.split(path)[0])
 	except: pass
+	if '__header__' in values:
+		for pattern, header in values['__header__'].items():
+			if re.match(pattern, m):
+				output=exec_local(header, full_path)+output
+				break
+	if '__footer__' in values:
+		for pattern, footer in values['__footer__'].items():
+			if re.match(pattern, m):
+				output=output+exec_local(footer, full_path)
+				break
 	with open(path, 'w') as f: f.write(output)
