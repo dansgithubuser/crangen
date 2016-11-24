@@ -89,12 +89,23 @@ for m in args.metasource:
 					format='{0:'+str(number_size)+'} '
 					numbered_metablock[j]=format.format(j+1)+numbered_metablock[j]
 				numbered_metablock='\n'.join(numbered_metablock)
-				print('exception raised executing metablock ending on line {0}'.format(i+1))
+				print('exception raised executing metablock ending on line {} of {}'.format(i+1, m))
 				print(traceback.format_exc())
 				print(numbered_metablock)
 				sys.exit(1)
 			result=result.strip().split('\n')
-			for j in range(len(result)): result[j]='\t'*tabs+result[j]+'//{}:{}'.format(m, i+1)
+			for j in range(len(result)):
+				comment={
+					'c': '//',
+					'h': '//',
+					'cpp': '//',
+					'hpp': '//',
+					'java': '//',
+					'py': '#',
+				}
+				extension=m.split('.')[-1]
+				if extension in comment:
+					result[j]='\t'*tabs+result[j]+'{}{}:{}'.format(comment[extension], m, i+1)
 			result='\n'.join(result)+'\n'
 			output+=result
 			metablock=''
