@@ -2,7 +2,7 @@ import style, lang_c, lang_cpp
 import argparse, fnmatch, os, re
 
 parser=argparse.ArgumentParser(description=(
-	'This is simple code generation framework. '+
+	'This is a simple code generation framework. '+
 	'The main goal is to be able to generate target code inline with Python code. '+
 	'Inline Python code is marked with surrounding /*\\ and \\*/ markings, each on their own line. '+
 	'Inline Python code can call the functions store(name, value) and load(name) to store variables across blocks. '+
