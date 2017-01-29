@@ -23,22 +23,20 @@ values={}
 def store(name, value): values[name]=value
 def load(name): return values[name]
 def exec_local(x, metasource):
-	locals={'result': ''}
-	exec(x,
-		{
-			'store': store,
-			'load': load,
-			'path': os.path.split(os.path.realpath(metasource))[0],
-			'relative_path': metasource,
-			'style': style,
-			'lang_c': lang_c,
-			'lang_cpp': lang_cpp,
-			're': re,
-			'os': os
-		},
-		locals
-	)
-	return locals['result']
+	scope={
+		'store': store,
+		'load': load,
+		'path': os.path.split(os.path.realpath(metasource))[0],
+		'relative_path': metasource,
+		'style': style,
+		'lang_c': lang_c,
+		'lang_cpp': lang_cpp,
+		're': re,
+		'os': os,
+		'result': ''
+	}
+	exec(x, scope)
+	return scope['result']
 
 if args.define:
 	for d in args.define:
