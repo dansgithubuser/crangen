@@ -23,12 +23,15 @@ args=parser.parse_args()
 values={}
 def store(name, value): values[name]=value
 def load(name): return values[name]
+def load_all(symbol_table):
+	for name, value in values.items(): symbol_table[name]=value
 def exec_local(x, metasource):
 	p=os.path.split(os.path.realpath(metasource))[0]
 	sys.path.append(p)
 	scope={
 		'store': store,
 		'load': load,
+		'load_all': load_all,
 		'path': p,
 		'relative_path': metasource,
 		'style': style,
