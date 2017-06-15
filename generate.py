@@ -1,5 +1,5 @@
 import style, lang_c, lang_cpp
-import argparse, fnmatch, os, re
+import argparse, fnmatch, os, re, sys
 
 parser=argparse.ArgumentParser(description=(
 	'This is a simple code generation framework. '+
@@ -24,10 +24,12 @@ values={}
 def store(name, value): values[name]=value
 def load(name): return values[name]
 def exec_local(x, metasource):
+	p=os.path.split(os.path.realpath(metasource))[0]
+	sys.path.append(p)
 	scope={
 		'store': store,
 		'load': load,
-		'path': os.path.split(os.path.realpath(metasource))[0],
+		'path': p,
 		'relative_path': metasource,
 		'style': style,
 		'lang_c': lang_c,
@@ -81,7 +83,7 @@ for m in args.metasource:
 			try:
 				result=exec_local(metablock, full_path)
 			except Exception as e:
-				import traceback, sys
+				import traceback
 				numbered_metablock=metablock.split('\n')
 				number_size=len(str(len(numbered_metablock)))
 				for j in range(len(numbered_metablock)):
