@@ -17,6 +17,7 @@ parser.add_argument('--metasource', action='append', help='path to metasource to
 parser.add_argument('--script', default=[], action='append', help='path to script to process')
 parser.add_argument('--output', default='.', help='path to put output')
 parser.add_argument('--define', action='append', help='define a variable with a value, separate with an equal sign, like variable=value')
+parser.add_argument('--suppress-origins', action='store_true', help='suppress comments in generated code showing which metasource line it came from')
 args=parser.parse_args()
 
 values={}
@@ -92,18 +93,19 @@ for m in args.metasource:
 				print(numbered_metablock)
 				sys.exit(1)
 			result=result.strip().split('\n')
-			for j in range(len(result)):
-				comment={
-					'c': '//',
-					'h': '//',
-					'cpp': '//',
-					'hpp': '//',
-					'java': '//',
-					'py': '#',
-				}
-				extension=m.split('.')[-1]
-				if extension in comment:
-					result[j]='\t'*tabs+result[j]+'{}{}:{}'.format(comment[extension], m, i+1)
+			if not args.suppress_origins:
+				for j in range(len(result)):
+					comment={
+						'c': '//',
+						'h': '//',
+						'cpp': '//',
+						'hpp': '//',
+						'java': '//',
+						'py': '#',
+					}
+					extension=m.split('.')[-1]
+					if extension in comment:
+						result[j]='\t'*tabs+result[j]+'{}{}:{}'.format(comment[extension], m, i+1)
 			result='\n'.join(result)+'\n'
 			output+=result
 			metablock=''
