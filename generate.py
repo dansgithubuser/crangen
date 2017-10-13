@@ -98,6 +98,8 @@ for m in args.metasource:
 				print(numbered_metablock)
 				sys.exit(1)
 			result=result.strip().split('\n')
+			for j in range(len(result)):
+				result[j]='\t'*tabs+result[j]
 			if not args.suppress_origins:
 				for j in range(len(result)):
 					comment={
@@ -110,7 +112,7 @@ for m in args.metasource:
 					}
 					extension=m.split('.')[-1]
 					if extension in comment:
-						result[j]='\t'*tabs+result[j]+'{}{}:{}'.format(comment[extension], m, i+1)
+						result[j]=result[j]+'{}{}:{}'.format(comment[extension], m, i+1)
 			result='\n'.join(result)+'\n'
 			output+=result
 			metablock=''
