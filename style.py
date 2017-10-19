@@ -20,7 +20,6 @@ def   to_upper(l): return '_'.join([x.upper() for x in l])
 def from_lower(s): return s.split('_')
 def   to_lower(l): return '_'.join([x.lower() for x in l])
 
-def indent(l, tabs):
-	s=''
-	for i in l: s+='\t'*tabs+i+'\n'
-	return s
+def indent(content, tabs=1):
+	if type(content)==str: content=content.splitlines()
+	return ''.join(['\t'*tabs+i+'\n' if i else '\n' for i in content])
